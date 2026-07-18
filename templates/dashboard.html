@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 class="page-title mb-4">
+    Dashboard
+</h2>
+
+<div class="row g-4">
+
+    <!-- Devices -->
+    <div class="col-xl-3 col-md-6">
+        <div class="card kpi-card border-primary">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h6>Total Devices</h6>
+
+                        <h2>{{ stats.total_devices }}</h2>
+
+                        <span class="kpi-status text-success">
+
+                            <i class="bi bi-check-circle-fill"></i>
+
+                            Healthy
+
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-router-fill kpi-icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CPU -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card kpi-card border-success">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h6>Average CPU</h6>
+
+                        <h2>{{ stats.avg_cpu }}%</h2>
+
+                        <span class="kpi-status text-success">
+
+                            Normal
+
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-cpu-fill kpi-icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Memory -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card kpi-card border-warning">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h6>Average Memory</h6>
+
+                        <h2>{{ stats.avg_memory }}%</h2>
+
+                        <span class="kpi-status text-warning">
+
+                            Stable
+
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-memory kpi-icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Latency -->
+
+    <div class="col-xl-3 col-md-6">
+
+        <div class="card kpi-card border-danger">
+
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between">
+
+                    <div>
+
+                        <h6>Average Latency</h6>
+
+                        <h2>{{ stats.avg_latency }} ms</h2>
+
+                        <span class="kpi-status text-info">
+
+                            Good
+
+                        </span>
+
+                    </div>
+
+                    <i class="bi bi-speedometer2 kpi-icon"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
