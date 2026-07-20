@@ -33,16 +33,27 @@ def compute_statistics(df):
         "avg_latency": round(df["Latency"].mean(), 2),
 
         "status": {
-            "UP": (df["Status"] == "UP").sum(),
-            "WARNING": (df["Status"] == "WARNING").sum(),
-            "CRITICAL": (df["Status"] == "CRITICAL").sum()
+            "labels": ["UP", "WARNING", "CRITICAL"],
+            "values": [
+                int((df["Status"] == "UP").sum()),
+                int((df["Status"] == "WARNING").sum()),
+                int((df["Status"] == "CRITICAL").sum())
+            ],
+            "UP": int((df["Status"] == "UP").sum()),
+            "WARNING": int((df["Status"] == "WARNING").sum()),
+            "CRITICAL": int((df["Status"] == "CRITICAL").sum())
+        },
+
+        "device_cpu": {
+            "labels": [str(device) for device in df["Device"].tolist()],
+            "values": [round(float(value), 2) for value in df["CPU"].tolist()]
         },
 
         "alerts": {
-            "high_cpu": (df["CPU"] > CPU_THRESHOLD).sum(),
-            "high_memory": (df["Memory"] > MEMORY_THRESHOLD).sum(),
-            "high_latency": (df["Latency"] > LATENCY_THRESHOLD).sum()
-        }
+            "high_cpu": int((df["CPU"] > CPU_THRESHOLD).sum()),
+            "high_memory": int((df["Memory"] > MEMORY_THRESHOLD).sum()),
+            "high_latency": int((df["Latency"] > LATENCY_THRESHOLD).sum())
+        },
     }
 
     return statistics

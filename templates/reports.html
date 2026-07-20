@@ -2,8 +2,106 @@
 
 {% block content %}
 
-<h2>Reports</h2>
+<div class="text-center mb-5">
 
-<p>Coming Soon...</p>
+    <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size:70px;"></i>
+
+    <h1 class="mt-3">
+        Reports Center
+    </h1>
+
+    <p class="lead text-muted">
+
+        Generate professional PDF reports containing
+        the latest network statistics, alerts and
+        infrastructure overview.
+
+    </p>
+
+    <a href="/download-report" class="btn btn-danger btn-lg mt-3">
+
+        <i class="bi bi-download"></i>
+
+        Generate PDF Report
+
+    </a>
+
+</div>
+
+<hr class="my-5">
+
+<div class="row g-4">
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h4>
+                    <i class="bi bi-check-circle-fill text-success"></i>
+                    Included in the Report
+                </h4>
+
+                <ul class="mt-4">
+
+                    <li>General Statistics</li>
+
+                    <li>CPU & Memory Overview</li>
+
+                    <li>Bandwidth Summary</li>
+
+                    <li>Latency Statistics</li>
+
+                    <li>Network Status</li>
+
+                    <li>Alerts Summary</li>
+
+                    <li>Device Inventory</li>
+
+                </ul>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+        <div class="card shadow-sm h-100">
+
+            <div class="card-body">
+
+                <h4>
+
+                    <i class="bi bi-info-circle-fill text-primary"></i>
+
+                    About Reports
+
+                </h4>
+
+                <p class="mt-4">
+
+                    Reports are generated automatically from the
+                    latest monitoring data available in the dashboard.
+
+                </p>
+
+                <p>
+
+                    They can be archived, shared with network
+                    administrators or attached to maintenance
+                    documentation.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
