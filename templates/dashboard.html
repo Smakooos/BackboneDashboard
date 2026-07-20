@@ -2,147 +2,99 @@
 
 {% block content %}
 
-<h2 class="page-title mb-4">
-    Dashboard
-</h2>
+<div class="dashboard-header">
+
+    <h1 class="page-title">
+        Welcome to the Backbone Dashboard
+    </h1>
+
+    <p class="subtitle">
+        Network Monitoring & Performance Overview
+    </p>
+
+</div>
 
 <div class="row g-4">
 
-    <!-- Devices -->
-    <div class="col-xl-3 col-md-6">
-        <div class="card kpi-card border-primary">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <h6>Total Devices</h6>
-
-                        <h2>{{ stats.total_devices }}</h2>
-
-                        <span class="kpi-status text-success">
-
-                            <i class="bi bi-check-circle-fill"></i>
-
-                            Healthy
-
-                        </span>
-
-                    </div>
-
-                    <i class="bi bi-router-fill kpi-icon"></i>
-
-                </div>
-
-            </div>
-
+    <div class="col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-router-fill"></i>
+            <h6>Total Devices</h6>
+            <h2>{{ stats.total_devices }}</h2>
         </div>
     </div>
 
-    <!-- CPU -->
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card kpi-card border-success">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <h6>Average CPU</h6>
-
-                        <h2>{{ stats.avg_cpu }}%</h2>
-
-                        <span class="kpi-status text-success">
-
-                            Normal
-
-                        </span>
-
-                    </div>
-
-                    <i class="bi bi-cpu-fill kpi-icon"></i>
-
-                </div>
-
-            </div>
-
+    <div class="col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-cpu-fill"></i>
+            <h6>Average CPU</h6>
+            <h2>{{ stats.avg_cpu }}%</h2>
         </div>
-
     </div>
 
-    <!-- Memory -->
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card kpi-card border-warning">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <h6>Average Memory</h6>
-
-                        <h2>{{ stats.avg_memory }}%</h2>
-
-                        <span class="kpi-status text-warning">
-
-                            Stable
-
-                        </span>
-
-                    </div>
-
-                    <i class="bi bi-memory kpi-icon"></i>
-
-                </div>
-
-            </div>
-
+    <div class="col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-memory"></i>
+            <h6>Average Memory</h6>
+            <h2>{{ stats.avg_memory }}%</h2>
         </div>
-
     </div>
 
-    <!-- Latency -->
-
-    <div class="col-xl-3 col-md-6">
-
-        <div class="card kpi-card border-danger">
-
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between">
-
-                    <div>
-
-                        <h6>Average Latency</h6>
-
-                        <h2>{{ stats.avg_latency }} ms</h2>
-
-                        <span class="kpi-status text-info">
-
-                            Good
-
-                        </span>
-
-                    </div>
-
-                    <i class="bi bi-speedometer2 kpi-icon"></i>
-
-                </div>
-
-            </div>
-
+    <div class="col-lg-3">
+        <div class="kpi-card">
+            <i class="bi bi-speedometer2"></i>
+            <h6>Average Latency</h6>
+            <h2>{{ stats.avg_latency }} ms</h2>
         </div>
-
     </div>
 
 </div>
+
+<div class="row mt-5">
+
+    <div class="col-lg-8">
+        <div class="card p-4 shadow-sm">
+            <h4>CPU Usage by Device</h4>
+            <canvas id="cpuChart" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 shadow-sm">
+            <h4>Network Status</h4>
+            <canvas id="statusChart" class="my-3"></canvas>
+
+            <ul class="list-group list-group-flush">
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>UP</span>
+                    <span>{{ stats.status.UP }}</span>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>WARNING</span>
+                    <span>{{ stats.status.WARNING }}</span>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>CRITICAL</span>
+                    <span>{{ stats.status.CRITICAL }}</span>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    window.dashboardStats = {
+        cpuLabels: {{ stats.device_cpu['labels'] | tojson }},
+        cpuValues: {{ stats.device_cpu['values'] | tojson }},
+        statusLabels: {{ stats.status['labels'] | tojson }},
+        statusValues: {{ stats.status['values'] | tojson }}
+    };
+</script>
 
 {% endblock %}

@@ -1,11 +1,33 @@
-.navbar-custom{
+.navbar{
 
-margin-bottom:40px;
+height:80px;
 
-display:flex;
+}
 
-justify-content:space-between;
+.navbar-brand{
 
-align-items:center;
+font-size:1.5rem;
+
+}
+
+.nav-link{
+
+margin-left:15px;
+
+font-weight:500;
+
+color:#555 !important;
+
+}
+
+.nav-link.active{
+
+color:#d71920 !important;
+
+}
+
+.nav-link:hover{
+
+color:#d71920 !important;
 
 }

@@ -4,9 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Djezzy Backbone Dashboard</title>
 
@@ -15,82 +13,134 @@ content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet"
 href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<link rel="stylesheet"
-href="{{ url_for('static',filename='css/main.css') }}">
-
-<link rel="stylesheet"
-href="{{ url_for('static',filename='css/sidebar.css') }}">
-
-<link rel="stylesheet"
-href="{{ url_for('static',filename='css/navbar.css') }}">
-
-<link rel="stylesheet"
-href="{{ url_for('static',filename='css/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/cards.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/responsive.css') }}">
 
 </head>
 
 <body>
 
-<div class="wrapper">
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
 
-    <aside class="sidebar">
+<div class="container">
 
-        <h3>
+<a class="navbar-brand fw-bold" href="/dashboard">
 
-            <i class="bi bi-hdd-network"></i>
+<span class="logo"></span>
 
-            Backbone
+Djezzy Backbone Dashboard
 
-        </h3>
+</a>
 
-        <a href="/dashboard"
-        class="{% if active_page=='dashboard' %}active{% endif %}">
-            <i class="bi bi-speedometer2"></i>
-            Dashboard
-        </a>
+<button class="navbar-toggler"
+data-bs-toggle="collapse"
+data-bs-target="#navbar">
 
-        <a href="/analytics"
-        class="{% if active_page=='analytics' %}active{% endif %}">
-            <i class="bi bi-graph-up"></i>
-            Analytics
-        </a>
+<span class="navbar-toggler-icon"></span>
 
-        <a href="/reports"
-        class="{% if active_page=='reports' %}active{% endif %}">
-            <i class="bi bi-file-earmark-pdf"></i>
-            Reports
-        </a>
+</button>
 
-        <a href="/project"
-        class="{% if active_page=='project' %}active{% endif %}">
-            <i class="bi bi-journal-code"></i>
-            Project
-        </a>
+<div class="collapse navbar-collapse" id="navbar">
 
-        <a href="/faq"
-        class="{% if active_page=='faq' %}active{% endif %}">
-            <i class="bi bi-question-circle"></i>
-            FAQ
-        </a>
+<ul class="navbar-nav ms-auto">
 
-    </aside>
+<li class="nav-item">
+<a class="nav-link {% if active_page=='dashboard' %}active{% endif %}" href="/dashboard">
+Dashboard
+</a>
+</li>
 
-    <main class="content">
+<li class="nav-item">
+<a class="nav-link {% if active_page=='analytics' %}active{% endif %}" href="/analytics">
+Analytics
+</a>
+</li>
 
-        <nav class="navbar-custom">
+<li class="nav-item">
+<a class="nav-link {% if active_page=='reports' %}active{% endif %}" href="/reports">
+Reports
+</a>
+</li>
 
-            <h4>Djezzy IP Backbone Dashboard</h4>
+<li class="nav-item">
+<a class="nav-link {% if active_page=='project' %}active{% endif %}" href="/project">
+Project
+</a>
+</li>
 
-        </nav>
+<li class="nav-item">
+<a class="nav-link {% if active_page=='faq' %}active{% endif %}" href="/faq">
+FAQ
+</a>
+</li>
 
-        {% block content %}
-        {% endblock %}
-
-    </main>
+</ul>
 
 </div>
 
+</div>
+
+</nav>
+
+<div class="container my-5">
+
+{% block content %}
+
+{% endblock %}
+
+</div>
+
+<footer>
+
+<div class="container">
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h5>Djezzy Backbone Dashboard</h5>
+
+<p>
+Academic Internship Project
+</p>
+
+</div>
+
+<div class="col-md-6 text-md-end">
+
+<p>
+
+Developed by
+
+<strong>BOUZID Noureddine</strong>
+
+</p>
+<p>
+
+ <strong> contact: nn_bouzid@esi.dz </strong>
+
+</p>
+<p>
+
+ESI - École Nationale Supérieure d'Informatique
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
 </body>
 

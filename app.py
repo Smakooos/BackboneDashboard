@@ -63,5 +63,31 @@ def faq():
     )
 
 
+from flask import send_file
+
+from reports.pdf_generator import generate_pdf
+
+
+@app.route("/download-report")
+def download_report():
+
+    df = load_csv("data/sample.csv")
+
+    stats = compute_statistics(df)
+
+    filename = "generated_reports/network_report.pdf"
+
+    generate_pdf(
+        filename,
+        stats,
+        df
+    )
+
+    return send_file(
+        filename,
+        as_attachment=True
+    )
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=5000)
