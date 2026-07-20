@@ -1,4 +1,6 @@
-from flask import Flask, render_template
+from datetime import datetime
+
+from flask import Flask, render_template, send_file
 
 from utils.parser import load_csv
 from utils.analyser import compute_statistics
@@ -63,8 +65,6 @@ def faq():
     )
 
 
-from flask import send_file
-
 from reports.pdf_generator import generate_pdf
 
 
@@ -75,7 +75,8 @@ def download_report():
 
     stats = compute_statistics(df)
 
-    filename = "generated_reports/network_report.pdf"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"generated_reports/network_report_{timestamp}.pdf"
 
     generate_pdf(
         filename,
@@ -85,7 +86,8 @@ def download_report():
 
     return send_file(
         filename,
-        as_attachment=True
+        as_attachment=True,
+        download_name="network_report.pdf"
     )
 
 

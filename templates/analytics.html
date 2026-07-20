@@ -2,8 +2,175 @@
 
 {% block content %}
 
-<h2>Analytics</h2>
+<div class="dashboard-header">
+    <h1 class="page-title">Analytics Deep Dive</h1>
+    <p class="subtitle">A more detailed view of performance, alert behavior, and device-level health.</p>
+</div>
 
-<p>Coming Soon...</p>
+<div class="row g-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card">
+            <i class="bi bi-router-fill"></i>
+            <h6>Total Devices</h6>
+            <h2>{{ stats.total_devices }}</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card">
+            <i class="bi bi-cpu-fill"></i>
+            <h6>Average CPU</h6>
+            <h2>{{ stats.avg_cpu }}%</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card">
+            <i class="bi bi-memory"></i>
+            <h6>Average Memory</h6>
+            <h2>{{ stats.avg_memory }}%</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="kpi-card">
+            <i class="bi bi-speedometer2"></i>
+            <h6>Average Latency</h6>
+            <h2>{{ stats.avg_latency }} ms</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-4">
+    <div class="col-lg-8">
+        <div class="card p-4 shadow-sm h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0">CPU Usage by Device</h4>
+                <span class="badge rounded-pill bg-danger-subtle text-danger">Performance trend</span>
+            </div>
+            <canvas id="cpuChart" height="220"></canvas>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 shadow-sm h-100">
+            <h4 class="fw-bold mb-3">Network Status</h4>
+            <canvas id="statusChart" class="my-3"></canvas>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>UP</span>
+                    <span>{{ stats.status.UP }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>WARNING</span>
+                    <span>{{ stats.status.WARNING }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>CRITICAL</span>
+                    <span>{{ stats.status.CRITICAL }}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 g-4">
+    <div class="col-lg-6">
+        <div class="card p-4 shadow-sm h-100">
+            <h4 class="fw-bold mb-3">Alert Summary</h4>
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border" style="background:#fff7f7;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">High CPU alerts</span>
+                            <span class="badge bg-danger">{{ stats.alerts.high_cpu }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border" style="background:#f7fbff;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">High Memory alerts</span>
+                            <span class="badge bg-warning text-dark">{{ stats.alerts.high_memory }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="p-3 rounded-3 border" style="background:#f8fff8;">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">High Latency alerts</span>
+                            <span class="badge bg-success">{{ stats.alerts.high_latency }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card p-4 shadow-sm h-100">
+            <h4 class="fw-bold mb-3">Operational Insight</h4>
+            <p class="text-muted mb-3">
+                The current network shows a balanced mix of healthy and at-risk devices. The most urgent attention should be given to systems with sustained high CPU, memory, or latency values.
+            </p>
+            <ul class="text-muted ps-3 mb-0">
+                <li>Monitor devices with elevated CPU usage first.</li>
+                <li>Investigate memory pressure on systems showing repeated warning states.</li>
+                <li>Review bandwidth and latency spikes that may affect service quality.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card p-4 shadow-sm">
+            <h4 class="fw-bold mb-3">Device-level performance</h4>
+            <div class="table-responsive">
+                <table class="table table-sm align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Device</th>
+                            <th>CPU</th>
+                            <th>Memory</th>
+                            <th>Bandwidth</th>
+                            <th>Latency</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for label in stats.device_cpu['labels'] %}
+                        <tr>
+                            <td>{{ label }}</td>
+                            <td>{{ stats.device_cpu['values'][loop.index0] }}%</td>
+                            <td>{{ stats.avg_memory }}%</td>
+                            <td>{{ stats.avg_bandwidth }} Mbps</td>
+                            <td>{{ stats.avg_latency }} ms</td>
+                            <td>
+                                {% if stats.device_cpu['values'][loop.index0] > 80 %}
+                                <span class="badge bg-danger">Critical</span>
+                                {% elif stats.device_cpu['values'][loop.index0] > 60 %}
+                                <span class="badge bg-warning text-dark">Warning</span>
+                                {% else %}
+                                <span class="badge bg-success">Healthy</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.dashboardStats = {
+        cpuLabels: {{ stats.device_cpu['labels'] | tojson }},
+        cpuValues: {{ stats.device_cpu['values'] | tojson }},
+        statusLabels: {{ stats.status['labels'] | tojson }},
+        statusValues: {{ stats.status['values'] | tojson }}
+    };
+</script>
 
 {% endblock %}
