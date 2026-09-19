@@ -15,22 +15,27 @@ Open `http://127.0.0.1:5000`. Development debug mode is opt-in: `$env:FLASK_DEBU
 
 ## Data format
 
-The dashboard reads `data/network_metrics.csv`. The collector writes this CSV with the columns `timestamp, device, ip, interface, status, in_mbps, out_mbps`. `status` uses standard SNMP `ifOperStatus` values: `1` is UP and `2` is treated as CRITICAL (down). The dashboard shows the latest measurement for each device/interface pair.
+The dashboard reads `data/network_metrics.csv`. The collector writes this CSV with the columns `timestamp, device, ip, interface, status, in_mbps, out_mbps`. `status` uses standard SNMP `ifOperStatus` values: `1` is UP and `2` is treated as CRITICAL (down). The dashboard shows the latest measurement for each `(device, interface)` pair, so identically named interfaces on different routers remain distinct.
 
 The included CSV is a local capture. For a fresh deployment, run the collector or supply a CSV in the documented format before opening the dashboard.
 
 ## SNMP collector
 
-Set credentials through environment variables; do not store the community string in source control.
+The collector polls these GNS3 lab routers every 10 seconds by default:
+
+- `CORE1` — `192.168.80.10`
+- `EDGE1` — `10.0.1.1`
+- `EDGE2` — `10.0.1.9`
+- `CORE2` — `10.0.1.18`
+
+Set the read-only community through an environment variable; the lab default is `BackboneRead`.
 
 ```powershell
-$env:SNMP_DEVICE_IP = "192.0.2.10"
 $env:SNMP_COMMUNITY = "your-read-only-community"
-$env:SNMP_DEVICE_NAME = "CORE1" # optional
 python collector/snmp_collector.py
 ```
 
-Optional variables: `SNMP_PORT` (default `161`), `SNMP_POLL_INTERVAL` (default `30` seconds), and `SNMP_DATA_FILE`.
+Optional variables: `SNMP_PORT` (default `161`), `SNMP_POLL_INTERVAL` (default `10` seconds), and `SNMP_DATA_FILE`.
 
 ## Tests
 

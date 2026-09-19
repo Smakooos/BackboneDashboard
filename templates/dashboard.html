@@ -4,6 +4,10 @@
 
 <div class="dashboard-header">
 
+    <div class="mb-3">
+        <img src="{{ url_for('static', filename='logoDjeezy.png') }}" alt="Djeezy Logo" class="img-fluid" style="max-width: 150px;">
+    </div>
+
     <h1 class="page-title">
         Welcome to the Backbone Dashboard
     </h1>
@@ -50,19 +54,62 @@
 
 </div>
 
+<section class="mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="mb-0">Network Devices</h3>
+        <span class="text-muted">Latest interface snapshot</span>
+    </div>
+    <div class="row g-4">
+        {% for item in stats.device_breakdown %}
+        <div class="col-md-6 col-xl-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="mb-1">{{ item.device }}</h4>
+                            <div class="text-muted small">IP: {{ item.ip }}</div>
+                        </div>
+                        <span class="badge {% if item.status == 'UP' %}text-bg-success{% elif item.status == 'DOWN' %}text-bg-secondary{% elif item.status == 'WARNING' %}text-bg-warning{% else %}text-bg-danger{% endif %}">
+                            {{ item.status }}
+                        </span>
+                    </div>
+                    <hr>
+                    <div class="small mb-2"><strong>Inbound:</strong> {{ item.in_mbps }} Mbps</div>
+                    <div class="small mb-2"><strong>Outbound:</strong> {{ item.out_mbps }} Mbps</div>
+                    <div class="small"><strong>Interfaces:</strong> {{ item.interfaces }} · {{ item.interfaces_up }} UP · {{ item.interfaces_down }} DOWN · {{ item.interfaces_critical }} CRITICAL</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12"><div class="alert alert-info mb-0">No SNMP device data is available yet.</div></div>
+        {% endfor %}
+    </div>
+</section>
+
 <div class="row mt-5">
 
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="card p-4 shadow-sm">
             <h4>Inbound Traffic by Device</h4>
-            <canvas id="deviceChart" height="220"></canvas>
+            <canvas id="inboundDeviceChart" height="220"></canvas>
         </div>
     </div>
 
-    <div class="col-lg-4">
+    <div class="col-lg-6">
         <div class="card p-4 shadow-sm">
-            <h4>Interface Status</h4>
-            <canvas id="statusChart" class="my-3"></canvas>
+            <h4>Outbound Traffic by Device</h4>
+            <canvas id="outboundDeviceChart" height="220"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="row mt-4">
+
+    <div class="col-lg-5">
+        <div class="card p-4 shadow-sm">
+            <h4>Device Status</h4>
+            <canvas id="deviceStatusChart" class="my-3"></canvas>
 
             <ul class="list-group list-group-flush">
 
@@ -86,6 +133,13 @@
         </div>
     </div>
 
+    <div class="col-lg-7">
+        <div class="card p-4 shadow-sm h-100">
+            <h4>Interface Status</h4>
+            <p class="text-muted mb-0">The interface chart below identifies each interface by <strong>device / interface</strong>, so identical names are never merged.</p>
+        </div>
+    </div>
+
 </div>
 
 <div class="row mt-4">
@@ -99,14 +153,20 @@
 
 <script>
     window.dashboardStats = {
-        deviceLabels: {{ stats.device_in['labels'] | tojson }},
-        deviceValues: {{ stats.device_in['values'] | tojson }},
+        deviceLabels: {{ stats.device_traffic['labels'] | tojson }},
+        deviceInbound: {{ stats.device_traffic['inbound'] | tojson }},
+        deviceOutbound: {{ stats.device_traffic['outbound'] | tojson }},
         interfaceLabels: {{ stats.interface_labels | default([]) | tojson }},
         interfaceIn: {{ stats.interface_in | default([]) | tojson }},
         interfaceOut: {{ stats.interface_out | default([]) | tojson }},
-        statusLabels: {{ stats.status['labels'] | tojson }},
-        statusValues: {{ stats.status['values'] | tojson }}
+        deviceStatusLabels: {{ stats.device_status['labels'] | tojson }},
+        deviceStatusValues: {{ stats.device_status['values'] | tojson }}
     };
+</script>
+<script>
+    setInterval(() => {
+        window.location.reload();
+    }, 10000);
 </script>
 
 {% endblock %}

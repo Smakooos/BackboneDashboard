@@ -18,8 +18,8 @@ def load_csv(file_path):
     """
     Load a CSV file and return it as a Pandas DataFrame.
 
-    The project currently stores both a legacy demo CSV and a raw SNMP export.
-    This parser accepts both formats and normalizes them to a consistent schema.
+    The collector may write either a headered CSV or an existing headerless
+    SNMP export. Both are normalized to the dashboard schema.
     """
 
     if not os.path.exists(file_path):
