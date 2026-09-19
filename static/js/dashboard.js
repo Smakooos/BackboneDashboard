@@ -4,22 +4,22 @@
 
 const chartData = window.dashboardStats || {};
 
-const cpuLabels = chartData.cpuLabels || [];
-const cpuValues = chartData.cpuValues || [];
+const deviceLabels = chartData.deviceLabels || [];
+const deviceValues = chartData.deviceValues || [];
 const interfaceLabels = chartData.interfaceLabels || [];
 const interfaceIn = chartData.interfaceIn || [];
 const interfaceOut = chartData.interfaceOut || [];
 const statusLabels = chartData.statusLabels || [];
 const statusValues = chartData.statusValues || [];
 
-if (document.getElementById("cpuChart")) {
-    new Chart(document.getElementById("cpuChart"), {
+if (document.getElementById("deviceChart")) {
+    new Chart(document.getElementById("deviceChart"), {
         type: "bar",
         data: {
-            labels: cpuLabels,
+            labels: deviceLabels,
             datasets: [{
                 label: "Inbound Traffic (Mbps)",
-                data: cpuValues,
+                data: deviceValues,
                 backgroundColor: "#d71920",
                 borderRadius: 8
             }]
@@ -42,7 +42,7 @@ if (document.getElementById("cpuChart")) {
 
 if (document.getElementById("interfaceChart") && interfaceLabels.length) {
     new Chart(document.getElementById("interfaceChart"), {
-        type: "line",
+        type: "bar",
         data: {
             labels: interfaceLabels,
             datasets: [
@@ -51,16 +51,14 @@ if (document.getElementById("interfaceChart") && interfaceLabels.length) {
                     data: interfaceIn,
                     borderColor: "#2563eb",
                     backgroundColor: "rgba(37, 99, 235, 0.15)",
-                    fill: true,
-                    tension: 0.3
+                    borderWidth: 1
                 },
                 {
                     label: "Outbound (Mbps)",
                     data: interfaceOut,
                     borderColor: "#16a34a",
                     backgroundColor: "rgba(22, 163, 74, 0.15)",
-                    fill: true,
-                    tension: 0.3
+                    borderWidth: 1
                 }
             ]
         },
@@ -93,10 +91,4 @@ if (document.getElementById("statusChart")) {
             responsive: true
         }
     });
-}
-
-if (window.location.pathname.includes("dashboard")) {
-    window.setInterval(() => {
-        window.location.reload();
-    }, 10000);
 }

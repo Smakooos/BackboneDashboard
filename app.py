@@ -1,14 +1,21 @@
-from flask import Flask, render_template
+import os
+from datetime import datetime
+from io import BytesIO
+from pathlib import Path
+
+from flask import Flask, render_template, send_file
 
 from utils.parser import load_csv
-from utils.analyser import compute_statistics
+from utils.analyser import compute_statistics, empty_statistics
+from reports.pdf_generator import generate_pdf
 
 app = Flask(__name__)
+BASE_DIR = Path(__file__).resolve().parent
+DATA_FILE = BASE_DIR / "data" / "network_metrics.csv"
 
 
 def get_stats():
-    df = load_csv("data/network_metrics.csv")
-    return compute_statistics(df)
+    return compute_statistics(load_csv(DATA_FILE)) or empty_statistics()
 
 
 @app.route("/")
@@ -63,31 +70,24 @@ def faq():
     )
 
 
-from flask import send_file
-
-from reports.pdf_generator import generate_pdf
-
-
 @app.route("/download-report")
 def download_report():
-
-    df = load_csv("data/network_metrics.csv")
-
-    stats = compute_statistics(df)
-
-    filename = "generated_reports/network_report.pdf"
-
-    generate_pdf(
-        filename,
-        stats,
-        df
-    )
-
+    df = load_csv(DATA_FILE)
+    stats = compute_statistics(df) or empty_statistics()
+    report = BytesIO()
+    generate_pdf(report, stats, df)
+    report.seek(0)
     return send_file(
-        filename,
-        as_attachment=True
+        report,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=f"network-report-{datetime.now():%Y%m%d-%H%M%S}.pdf",
     )
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(
+        debug=os.getenv("FLASK_DEBUG", "false").lower() == "true",
+        host=os.getenv("FLASK_HOST", "127.0.0.1"),
+        port=int(os.getenv("FLASK_PORT", "5000")),
+    )

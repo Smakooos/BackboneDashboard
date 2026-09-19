@@ -5,9 +5,22 @@
 import pandas as pd
 
 
-CPU_THRESHOLD = 80
-MEMORY_THRESHOLD = 80
-LATENCY_THRESHOLD = 30
+INBOUND_THRESHOLD_MBPS = 80
+OUTBOUND_THRESHOLD_MBPS = 80
+
+
+def empty_statistics():
+    """Return the complete template/API contract when no data is available."""
+    return {
+        "total_devices": 0, "total_interfaces": 0,
+        "avg_in_mbps": 0.0, "avg_out_mbps": 0.0,
+        "status": {"labels": ["UP", "WARNING", "CRITICAL"], "values": [0, 0, 0],
+                   "UP": 0, "WARNING": 0, "CRITICAL": 0},
+        "device_in": {"labels": [], "values": []},
+        "interface_labels": [], "interface_in": [], "interface_out": [],
+        "device_breakdown": [],
+        "alerts": {"high_inbound": 0, "high_outbound": 0},
+    }
 
 
 def _normalize_status(value):
@@ -19,47 +32,17 @@ def _normalize_status(value):
     if value_str in {"1", "up", "online", "active"}:
         return "UP"
 
-    if value_str in {"2", "warning", "warn"}:
+    if value_str in {"3", "warning", "warn", "testing"}:
         return "WARNING"
 
     return "CRITICAL"
-
-
-def _legacy_statistics(df):
-    statistics = {
-        "total_devices": int(df["device"].nunique()),
-        "avg_cpu": round(float(df["cpu"].mean()), 2),
-        "avg_memory": round(float(df["memory"].mean()), 2),
-        "avg_bandwidth": round(float(df["bandwidth"].mean()), 2),
-        "avg_latency": round(float(df["latency"].mean()), 2),
-        "status": {
-            "labels": ["UP", "WARNING", "CRITICAL"],
-            "values": [
-                int((df["status"] == "UP").sum()),
-                int((df["status"] == "WARNING").sum()),
-                int((df["status"] == "CRITICAL").sum()),
-            ],
-            "UP": int((df["status"] == "UP").sum()),
-            "WARNING": int((df["status"] == "WARNING").sum()),
-            "CRITICAL": int((df["status"] == "CRITICAL").sum()),
-        },
-        "device_cpu": {
-            "labels": [str(device) for device in df["device"].tolist()],
-            "values": [round(float(value), 2) for value in df["cpu"].tolist()],
-        },
-        "alerts": {
-            "high_cpu": int((df["cpu"] > CPU_THRESHOLD).sum()),
-            "high_memory": int((df["memory"] > MEMORY_THRESHOLD).sum()),
-            "high_latency": int((df["latency"] > LATENCY_THRESHOLD).sum()),
-        },
-    }
-    return statistics
 
 
 def _snmp_statistics(df):
     latest_snapshot = df.copy()
 
     if "timestamp" in latest_snapshot.columns:
+        latest_snapshot["timestamp"] = pd.to_datetime(latest_snapshot["timestamp"], errors="coerce")
         latest_snapshot = latest_snapshot.sort_values("timestamp").drop_duplicates(
             subset=["device", "interface"], keep="last"
         )
@@ -68,10 +51,15 @@ def _snmp_statistics(df):
     latest_snapshot["out_mbps"] = pd.to_numeric(latest_snapshot["out_mbps"], errors="coerce").fillna(0.0)
     latest_snapshot["status"] = latest_snapshot["status"].apply(_normalize_status)
 
-    device_summary = latest_snapshot.groupby("device", as_index=False).agg(
+    status_rank = {"UP": 0, "WARNING": 1, "CRITICAL": 2}
+    latest_snapshot["status_rank"] = latest_snapshot["status"].map(status_rank)
+    device_summary = latest_snapshot.groupby("device", as_index=False, sort=False).agg(
         in_mbps=("in_mbps", "mean"),
         out_mbps=("out_mbps", "mean"),
-        status=("status", lambda s: s.mode().iloc[0] if not s.empty else "CRITICAL")
+        status_rank=("status_rank", "max"),
+    )
+    device_summary["status"] = device_summary["status_rank"].map(
+        {value: key for key, value in status_rank.items()}
     )
 
     status_counts = latest_snapshot["status"].value_counts().to_dict()
@@ -81,7 +69,7 @@ def _snmp_statistics(df):
         "CRITICAL": int(status_counts.get("CRITICAL", 0)),
     }
 
-    interface_summary = latest_snapshot.groupby("interface", as_index=False).agg(
+    interface_summary = latest_snapshot.groupby("interface", as_index=False, sort=False).agg(
         in_mbps=("in_mbps", "mean"),
         out_mbps=("out_mbps", "mean")
     )
@@ -91,7 +79,6 @@ def _snmp_statistics(df):
         "total_interfaces": int(latest_snapshot["interface"].nunique()),
         "avg_in_mbps": round(float(latest_snapshot["in_mbps"].mean()), 2),
         "avg_out_mbps": round(float(latest_snapshot["out_mbps"].mean()), 2),
-        "avg_latency": 0.0,
         "status": {
             "labels": ["UP", "WARNING", "CRITICAL"],
             "values": [
@@ -103,7 +90,7 @@ def _snmp_statistics(df):
             "WARNING": status_values["WARNING"],
             "CRITICAL": status_values["CRITICAL"],
         },
-        "device_cpu": {
+        "device_in": {
             "labels": [str(device) for device in device_summary["device"].tolist()],
             "values": [round(float(value), 2) for value in device_summary["in_mbps"].tolist()],
         },
@@ -120,9 +107,8 @@ def _snmp_statistics(df):
             for row in device_summary.to_dict("records")
         ],
         "alerts": {
-            "high_cpu": int((device_summary["in_mbps"] > CPU_THRESHOLD).sum()),
-            "high_memory": int((device_summary["out_mbps"] > MEMORY_THRESHOLD).sum()),
-            "high_latency": 0,
+            "high_inbound": int((device_summary["in_mbps"] > INBOUND_THRESHOLD_MBPS).sum()),
+            "high_outbound": int((device_summary["out_mbps"] > OUTBOUND_THRESHOLD_MBPS).sum()),
         },
     }
 
@@ -133,20 +119,16 @@ def compute_statistics(df):
     """
     Compute the main network statistics from a Pandas DataFrame.
 
-    The CSV can either describe the legacy demo dataset or the SNMP export from
-    the network collector. This function handles both layouts.
+    The dashboard accepts the normalized SNMP export produced by the collector.
     """
 
     if df is None or df.empty:
-        return {}
+        return empty_statistics()
 
     df = df.copy()
     df.columns = [str(column).strip().lower() for column in df.columns]
 
-    if {"device", "cpu", "memory", "bandwidth", "latency", "status"}.issubset(df.columns):
-        return _legacy_statistics(df)
-
     if {"device", "status", "in_mbps", "out_mbps"}.issubset(df.columns):
         return _snmp_statistics(df)
 
-    return {}
+    return empty_statistics()

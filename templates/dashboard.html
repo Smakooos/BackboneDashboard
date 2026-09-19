@@ -55,13 +55,13 @@
     <div class="col-lg-8">
         <div class="card p-4 shadow-sm">
             <h4>Inbound Traffic by Device</h4>
-            <canvas id="cpuChart" height="220"></canvas>
+            <canvas id="deviceChart" height="220"></canvas>
         </div>
     </div>
 
     <div class="col-lg-4">
         <div class="card p-4 shadow-sm">
-            <h4>Network Status</h4>
+            <h4>Interface Status</h4>
             <canvas id="statusChart" class="my-3"></canvas>
 
             <ul class="list-group list-group-flush">
@@ -99,8 +99,8 @@
 
 <script>
     window.dashboardStats = {
-        cpuLabels: {{ stats.device_cpu['labels'] | tojson }},
-        cpuValues: {{ stats.device_cpu['values'] | tojson }},
+        deviceLabels: {{ stats.device_in['labels'] | tojson }},
+        deviceValues: {{ stats.device_in['values'] | tojson }},
         interfaceLabels: {{ stats.interface_labels | default([]) | tojson }},
         interfaceIn: {{ stats.interface_in | default([]) | tojson }},
         interfaceOut: {{ stats.interface_out | default([]) | tojson }},
