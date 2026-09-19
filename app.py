@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 
 def get_stats():
-    df = load_csv("data/sample.csv")
+    df = load_csv("data/network_metrics.csv")
     return compute_statistics(df)
 
 
@@ -71,7 +71,7 @@ from reports.pdf_generator import generate_pdf
 @app.route("/download-report")
 def download_report():
 
-    df = load_csv("data/sample.csv")
+    df = load_csv("data/network_metrics.csv")
 
     stats = compute_statistics(df)
 

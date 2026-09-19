@@ -26,25 +26,25 @@
 
     <div class="col-lg-3">
         <div class="kpi-card">
-            <i class="bi bi-cpu-fill"></i>
-            <h6>Average CPU</h6>
-            <h2>{{ stats.avg_cpu }}%</h2>
+            <i class="bi bi-arrow-down-circle-fill"></i>
+            <h6>Average Inbound</h6>
+            <h2>{{ stats.avg_in_mbps|default(0) }} Mbps</h2>
         </div>
     </div>
 
     <div class="col-lg-3">
         <div class="kpi-card">
-            <i class="bi bi-memory"></i>
-            <h6>Average Memory</h6>
-            <h2>{{ stats.avg_memory }}%</h2>
+            <i class="bi bi-arrow-up-circle-fill"></i>
+            <h6>Average Outbound</h6>
+            <h2>{{ stats.avg_out_mbps|default(0) }} Mbps</h2>
         </div>
     </div>
 
     <div class="col-lg-3">
         <div class="kpi-card">
-            <i class="bi bi-speedometer2"></i>
-            <h6>Average Latency</h6>
-            <h2>{{ stats.avg_latency }} ms</h2>
+            <i class="bi bi-link-45deg"></i>
+            <h6>Active Interfaces</h6>
+            <h2>{{ stats.total_interfaces|default(0) }}</h2>
         </div>
     </div>
 
@@ -54,7 +54,7 @@
 
     <div class="col-lg-8">
         <div class="card p-4 shadow-sm">
-            <h4>CPU Usage by Device</h4>
+            <h4>Inbound Traffic by Device</h4>
             <canvas id="cpuChart" height="220"></canvas>
         </div>
     </div>
@@ -88,10 +88,22 @@
 
 </div>
 
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card p-4 shadow-sm">
+            <h4>SNMP Throughput by Interface</h4>
+            <canvas id="interfaceChart" height="220"></canvas>
+        </div>
+    </div>
+</div>
+
 <script>
     window.dashboardStats = {
         cpuLabels: {{ stats.device_cpu['labels'] | tojson }},
         cpuValues: {{ stats.device_cpu['values'] | tojson }},
+        interfaceLabels: {{ stats.interface_labels | default([]) | tojson }},
+        interfaceIn: {{ stats.interface_in | default([]) | tojson }},
+        interfaceOut: {{ stats.interface_out | default([]) | tojson }},
         statusLabels: {{ stats.status['labels'] | tojson }},
         statusValues: {{ stats.status['values'] | tojson }}
     };
